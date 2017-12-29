@@ -1,0 +1,3 @@
+<view class="layout" capture-bind:tap="onVenylogBeancon">
+  $slot$
+</view>

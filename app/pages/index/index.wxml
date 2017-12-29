@@ -1,0 +1,5 @@
+<view class="index-screen">
+  <view class="logo" data-veny-name="click-log" data-veny-param="arthur-pendragon">
+    Arthur Pendragon
+  </view>
+</view>
