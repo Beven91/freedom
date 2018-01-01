@@ -93,6 +93,64 @@
      })
 ```
 
+###### 关于重试机制
+
+在部分业务场景下，我们希望指定接口在调用失败情况下能，进行重试，
+
+默认的重试条件为:`在接口发生网络错误时，或者wx.request失败时`会进行重试
+
+还可以指定额外的重试提交，这里通常用于设置业务异常
+
+执行重试可以通过`try`函数进行重试配置 例如:`network.get(/query').try(10)`
+
+具体参照如下:
+
+```js
+  const network  = new Network();
+
+  //默认重试
+  network
+    .get('/query',{size:20})
+    //配置重试机制 指定重试次数为2次
+    .try(2)
+    .then((data)=>{
+     })
+
+  //追加自定义重试条件
+  network
+    .get('/query',{size:20})
+    //配置重试机制 指定重试次数为2次,出现条件为 在返回的结果的id<0时进行重试
+    .try(2,(resp)=>resp.data.id<0)
+    .then((data)=>{
+     })
+
+```
+
+###### 关于合并请求
+
+有时候我们希望同时发出几个请求，但是希望在这几个请求全部请求完毕后，再执行回调
+
+然后在回调中能获取到每个请求的结果，通过以下方式我们可以合并请求(不是串联方式发送，而是同时发出)
+
+具体参照如下:
+
+```js
+  const network  = new Network();
+
+  //默认重试
+  network
+    .get('/getinfo',{size:20})
+    //通过merge链式函数，合并network.post('/getorders')请求
+    .merge(network.post('/getorders'),'orders')
+    .then((data)=>{
+        //这里可以获取合并的结果，
+        const info = data.original;//original为第一个请求的结果
+        //获取第二个请求结果
+        const orders = data.orders;
+     })
+
+```
+
 ###### 关于接口返回结果扩展
 
 通过`network`发起接口请求，会返回一个`AttachResponse`实例，该实例支持promise机制，且能扩展结果处理链

@@ -64,47 +64,80 @@ export default class Network {
      * @param {String} uri 服务端接口url 可以为完整路径或者相对路径
      * 完整路径例如: https://api.pendragon/rest/order/submit
      * 相对路径： 相对路径是相对于 Network.config() 配置的 baseUri
-     * @param {Object/FormData} 发送的正文数据 ，可以为json对象或者字符串或者FormData
+     * @param {Object} 发送的正文数据 ，可以为json对象或者字符串或者
      * @param {String} method 请求类型 例如 Get Post Put Delete 等
      * @param {Object} headers  发送报文首部配置
      */
     any(uri, data, method, headers) {
         emitter.emit('start', data, headers);
+        const context = { assert: defaultAssert, useTry: false, tryMax: 0, uri, data, method, headers };
         const promise = new Promise((resolve, reject) => {
-            wx.request({
-                url: combine(uri, method, data),
-                //请求谓词
-                method,
-                //请求首部
-                header: headers = {
-                    'X-P': 'wxapp',
-                    'Content-Type': Options.defaultContentType || 'application/x-www-form-urlencoded',
-                    //合并传入的headers 传入的headers会覆盖前面行配置的默认headers
-                    ...headers,
-                },
-                //请求正文
-                data: merge(data, Options.data),
-                //请求成功
-                success: (response) => {
-                    const { statusCode } = response;
-                    emitter.emit('end', response);
-                    emitter.emit('response', response);
-                    if (statusCode >= 200 && statusCode < 300 || statusCode === 304) {
-                        resolve(response);
-                    } else {
-                        emitter.emit('error', response);
-                        reject(response);
-                    }
-                },
-                //请求失败
-                fail: (error) => {
+            this.doRequest(context, resolve, reject, 0);
+        })
+        return new AttachResponse(promise, context);
+    }
+
+    /**
+     * 发送wx.request请求
+     * @param {Function} resolve 成功的回调通知函数
+     * @param {Function} reject 失败时的回调通知函数
+     * @param {Object} context 请求上下文参数
+     * @param {Number} tryProcess 当前尝试的次数
+     */
+    doRequest(context, resolve, reject, tryProcess) {
+        const { uri, data, headers, method } = context;
+        const tryRequest = this.tryRequest.bind(this, context, reject, resolve, tryProcess);
+        wx.request({
+            url: combine(uri, method, data),
+            //请求谓词
+            method,
+            //请求首部
+            header: {
+                'X-P': 'wxapp',
+                'Content-Type': Options.defaultContentType || 'application/x-www-form-urlencoded',
+                //合并传入的headers 传入的headers会覆盖前面行配置的默认headers
+                ...headers,
+            },
+            //请求正文
+            data: merge(data, Options.data),
+            //请求成功
+            success: (response) => {
+                const { statusCode } = response;
+                const isOK = statusCode >= 200 && statusCode < 300 || statusCode === 304;
+                const tryAssert = context.useTry && context.assert(response);
+                emitter.emit('end', response);
+                emitter.emit('response', response);
+                if (isOK && !tryAssert) {
+                    resolve(response)
+                } else if (!tryRequest()) {
+                    reject(response);
+                    emitter.emit('error', response);
+                }
+            },
+            //请求失败
+            fail: (error) => {
+                if (!tryRequest()) {
                     emitter.emit('end', error);
                     emitter.emit('error', error);
                     reject(error);
                 }
-            });
-        })
-        return new AttachResponse(promise);
+            }
+        });
+    }
+
+    /**
+     * 请求重试
+     * @param {Function} resolve 成功的回调通知函数
+     * @param {Function} reject 失败时的回调通知函数
+     * @param {Object} context 请求上下文参数
+     * @param {Number} tryProcess 当前尝试的次数
+     */
+    tryRequest(context, reject, resolve, tryProcess) {
+        const { useTry, tryMax } = context;
+        const needTry = useTry && tryProcess < tryMax;
+        console.log('retry uri:' + context.uri);
+        needTry ? this.doRequest(context, resolve, reject, ++tryProcess) : undefined;
+        return needTry;
     }
 }
 
@@ -113,8 +146,9 @@ export default class Network {
  */
 class AttachResponse {
 
-    constructor(promise) {
+    constructor(promise, context) {
         this.contextResult = {};
+        Object.defineProperty(this, 'context', { writable: false, configurable: false, value: context });
         this.promise = promise;
     }
 
@@ -197,6 +231,24 @@ class AttachResponse {
             })
         });
     }
+
+    /**
+     * 开启重试机制
+     * 当网络访问失败时，进行重试
+     * @param {Number} max 重试最大的次数 默认值=1
+     * @param {Function} errorAssert 需要进行重试的条件函数,默认重试条件为:请求网络错误
+     *         例如: function(response){ return response.status!=200  };
+     *           
+     */
+    try(max = 1, errorAssert) {
+        this.context.useTry = true;
+        this.context.tryMax = max;
+        if (Type.isFunction(errorAssert)) {
+            this.context.assert = errorAssert;
+        }
+        return this;
+    }
+
 }
 
 /**
@@ -225,4 +277,8 @@ function combine(uri, method, data) {
         uri = Options.baseUri + uri;
     }
     return uri;
+}
+
+function defaultAssert() {
+    return false;
 }
