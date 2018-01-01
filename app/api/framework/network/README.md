@@ -134,8 +134,7 @@
 
 ```js
   const network  = new Network();
-
-  //默认重试
+  
   network
     .get('/getinfo',{size:20})
     //通过merge链式函数，合并network.post('/getorders')请求
