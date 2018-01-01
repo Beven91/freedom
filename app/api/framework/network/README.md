@@ -4,9 +4,7 @@
 
 基于`wx.request`装类的接口访问类
 
-可以进行全局接口请求监听,返回结果扩展(`AttachResponse`)，支持`promise` 以及`loading`效果 
-
-`至于是否支持重试机制，相信聪明的你可以实现哦`
+可以进行全局接口请求监听,返回结果扩展(`AttachResponse`)，支持`promise` 以及`loading`效果 以及`重试机制`
 
 ## 使用介绍
 
@@ -99,9 +97,9 @@
 
 默认的重试条件为:`在接口发生网络错误时，或者wx.request失败时`会进行重试
 
-还可以指定额外的重试提交，这里通常用于设置业务异常
-
 执行重试可以通过`try`函数进行重试配置 例如:`network.get(/query').try(10)`
+
+还可以指定额外的重试条件， 例如: `network.get('/query').try(10,(resp)=>resp.data==null)`
 
 具体参照如下:
 
