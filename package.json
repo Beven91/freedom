@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "install": "npm link ./app/api/framework && npm link ./app/api/services && npm link ./app/api/config",
+    "prestart":"npm run link",
+    "link": "npm link ./app/api/framework && npm link ./app/api/services && npm link ./app/api/config",
+    "install": "npm run link",
     "start": "cross-env NODE_ENV=development webpack --watch --config ./build/webpack.js --color",
     "build": "cross-env NODE_ENV=production webpack --config ./build/webpack.js --color"
   },

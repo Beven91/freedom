@@ -38,7 +38,10 @@ module.exports = {
   devtool: isProduction ? '' : 'source-map',
   name: 'freedom',
   context: config.src,
-  stats: 'errors-only',
+  stats: {
+    assets:false,
+    chunks:false
+  },
   target: "node",
   entry: {
     'app': [
@@ -69,18 +72,14 @@ module.exports = {
       {
         // 使用babel编译js
         test: /\.js$/,
-        exclude: [
-          /webpack/,
-          /webpack-/,
-          /babel/,
-          /babel-/,
-          /babel-runtime/,
-          /core-js/
+        include:[
+          path.resolve('app')
         ],
         use: [
           {
             loader: 'babel-loader',
             options: {
+              cacheDirectory:true,
               presets: config.presets,
               plugins: config.plugins
             }
