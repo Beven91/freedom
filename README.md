@@ -29,11 +29,11 @@
 
 ## 三、关于框架
 
-- [`framework`](/app/api/framework)
-- [`handlers`](/app/api/handlers)
-- [`components`](/app/components)
-- [`pages`](/app/pages)
-- [`modules`](/app/modules)
+- [`framework`](/packages/framework)
+- [`services`](/packages/services)
+- [`components`](/packages/app/components)
+- [`pages`](/packages/app/pages)
+- [`modules`](/packages/app/modules)
 
 &#8195;
 

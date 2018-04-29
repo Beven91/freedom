@@ -1,0 +1,9 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "dependencies": {
+    "framework": "^1.0.0",
+    "services": "^1.0.0",
+    "configs": "^1.0.0"
+  }
+}

@@ -1,7 +1,27 @@
 {
   "plugins": [
     "transform-object-rest-spread",
-    "transform-runtime" 
+    "transform-runtime",
+    [
+      "refer-import",
+      [
+        {
+          "libraryName": "dantejs",
+          "style": false,
+          "libraryDirectory": "src"
+        },
+        {
+          "libraryName": "framework",
+          "style": false,
+          "libraryDirectory": ""
+        },
+        {
+          "libraryName": "services",
+          "style": false,
+          "libraryDirectory": ""
+        }
+      ]
+    ]
   ],
   "presets": [
     [

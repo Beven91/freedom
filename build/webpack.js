@@ -12,33 +12,27 @@ const config = require('./index');
 
 const isProduction = process.env.NODE_ENV === 'production';
 //插件
-//进度条插件
-const ProgressBarPlugin = require('progress-bar-webpack-plugin')
 //微信小程序插件
 const WxappModulePlugin = require('webpack-wxapp-module-plugin/index');
+//兼容vscode 盘符大小写问题(windows)
+const ConflictPlugin = require('./plugins/conflict');
 //清除插件
 var CleanWebpackPlugin = require('clean-webpack-plugin')
 
 //开发环境插件
 var devPlugins = [
-
 ]
 
 //生产环境插件
 var productionPlugins = [
-  new webpack.optimize.UglifyJsPlugin({
-    compressor: {
-      warnings: false
-    },
-    sourceMap: true
-  })
 ]
 
 module.exports = {
   devtool: isProduction ? '' : 'source-map',
   name: 'freedom',
+  mode: isProduction ? 'production' : 'development',
   context: config.src,
-  stats: 'errors-only',
+  stats: { children: false, chunks: false, assets: false, modules: false },
   target: "node",
   entry: {
     'app': [
@@ -53,7 +47,8 @@ module.exports = {
     publicPath: ''
   },
   plugins: [
-    new ProgressBarPlugin(),
+    new ConflictPlugin(),
+    new webpack.ProgressPlugin(),
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify(isProduction ? 'production' : 'development'),
@@ -65,22 +60,19 @@ module.exports = {
     new webpack.NoEmitOnErrorsPlugin(),
   ].concat(isProduction ? productionPlugins : devPlugins),
   module: {
-    loaders: [
+    rules: [
       {
         // 使用babel编译js
         test: /\.js$/,
-        exclude: [
-          /webpack/,
-          /webpack-/,
-          /babel/,
-          /babel-/,
-          /babel-runtime/,
-          /core-js/
+        include: [
+          /packages/,
+          /dantejs/
         ],
         use: [
           {
             loader: 'babel-loader',
             options: {
+              cacheDirectory: true,
               presets: config.presets,
               plugins: config.plugins
             }
@@ -89,7 +81,7 @@ module.exports = {
       },
       //使用file-loader处理资源文件复制
       {
-        test: /\.(json|wxss)$/,
+        test: /\.(wxss)$/,
         use: [
           {
             loader: 'file-loader',
@@ -150,8 +142,10 @@ module.exports = {
             },
           },
           {
-            loader: 'wxml-loader',
+            loader: 'webpack-wxml-loader',
             options: {
+              target:'Wechat',
+              context:config.src,
               publicPath: '/',
               root: config.src,
             },

@@ -8,7 +8,7 @@ const fse = require('fs-extra');
 
 module.exports = {
   //源代码代码目录
-  src: path.resolve('app'),
+  src: path.resolve('packages/app'),
   //目标目录
   dist: path.resolve('dist'),
   //babel配置
