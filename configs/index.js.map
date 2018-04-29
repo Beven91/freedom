@@ -1,1 +1,0 @@
-{"version":3,"sources":["webpack:///../configs/index.js"],"names":["API","VENYLOG"],"mappings":";;;;;kBAAe;AACbA,OAAK,sBADQ;AAEbC,WAAS;AAFI,C","file":"../configs/index.js","sourcesContent":["export default {\r\n  API: 'https://demo.api.com',\r\n  VENYLOG: 'https://demo.log.com/l.gif',\r\n}"],"sourceRoot":""}
