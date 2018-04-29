@@ -64,24 +64,15 @@ module.exports = {
       {
         // 使用babel编译js
         test: /\.js$/,
-<<<<<<< HEAD
         include: [
           /packages/,
           /dantejs/
-=======
-        include:[
-          path.resolve('app')
->>>>>>> ac4264aedeed5aa34bf89de7ffeab47fa3c1b621
         ],
         use: [
           {
             loader: 'babel-loader',
             options: {
-<<<<<<< HEAD
               cacheDirectory: true,
-=======
-              cacheDirectory:true,
->>>>>>> ac4264aedeed5aa34bf89de7ffeab47fa3c1b621
               presets: config.presets,
               plugins: config.plugins
             }
