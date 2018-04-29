@@ -5,9 +5,16 @@
   "description": "微信小程序脚手架",
   "main": "index.js",
   "scripts": {
+<<<<<<< HEAD
     "test": "jest",
     "lerna": "lerna bootstrap --hoist --ignore-scripts",
     "postinstall": "npm run lerna",
+=======
+    "test": "mocha",
+    "prestart":"npm run link",
+    "link": "npm link ./app/api/framework && npm link ./app/api/services && npm link ./app/api/config",
+    "install": "npm run link",
+>>>>>>> ac4264aedeed5aa34bf89de7ffeab47fa3c1b621
     "start": "cross-env NODE_ENV=development webpack --watch --config ./build/webpack.js --color",
     "build": "cross-env NODE_ENV=production webpack --config ./build/webpack.js --color"
   },
