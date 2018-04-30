@@ -11,6 +11,6 @@ compiler.watch({}, function (err, stats) {
     console.error(stats.toString(compiler.options.stats || {}))
   }else{
     console.log(stats.toString(compiler.options.stats || {}))
-    console.log('服务已启动，请使用微信开发者工具附加/dist目录。');
   }
 });
+console.log('服务已启动，请使用微信开发者工具附加/dist目录。');

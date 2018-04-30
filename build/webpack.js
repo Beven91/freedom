@@ -25,6 +25,7 @@ var devPlugins = [
 
 //生产环境插件
 var productionPlugins = [
+  new CleanWebpackPlugin('*', { root: config.dist })
 ]
 
 module.exports = {
@@ -54,8 +55,7 @@ module.exports = {
         NODE_ENV: JSON.stringify(isProduction ? 'production' : 'development'),
       }
     }),
-    new WxappModulePlugin(config.src, 'third_modules', ['.scss']),
-    new CleanWebpackPlugin('*', { root: config.dist }),
+    new WxappModulePlugin('third_modules', ['.scss']),
     new webpack.DefinePlugin({ 'process.env': { NODE_ENV: process.env.NODE_ENV } }),
     new webpack.NoEmitOnErrorsPlugin(),
   ].concat(isProduction ? productionPlugins : devPlugins),
