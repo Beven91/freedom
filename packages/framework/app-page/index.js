@@ -12,7 +12,7 @@ import Venylog from '../venylog';
 import Preload from '../preload';
 
 const blackList = [
-  "lock", "_lock", "unlock", "_unlock", "constructor", "setData"
+  "lock", "_lock", "unlock", "_unlock", "constructor", "setData","__locked"
 ];
 
 export default class AppPage {
